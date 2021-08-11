@@ -19,12 +19,7 @@ async function run() {
     const repoDestination = Core.getInput('repo-destination')
     const ownerDestination = Core.getInput('owner-destination')
     const issuesWithLabels = Core.getInput('labels').split(',')
-    const issuesWithStatus = Core.getInput('status')
-
-    console.log('RepoSource', Github.context.repo.repo)
-    console.log('ownerSource', Github.context.repo.owner)
-    console.log('RepoSource', repoSource)
-    console.log('ownerSource', ownerSource)
+    const issuesWithState = Core.getInput('state')
     Core.endGroup()
 
     Core.startGroup("📑 Getting all Issues in repository...")
@@ -32,12 +27,11 @@ async function run() {
     let issuesPage
     do {
       Core.info(`Getting data from Issues page ${page}...`)
-      console.log('RepoSource', repoSource)
-      console.log('ownerSource', ownerSource)
+
       issuesPage = await octokit.issues.listForRepo({
         owner: ownerSource,
         repo: repoSource,
-        state: issuesWithStatus,
+        state: issuesWithState,
         labels: issuesWithLabels,
         page
       });
@@ -57,6 +51,7 @@ async function run() {
       }
       page++
     } while (issuesPage.data.length)
+    Core.info(`All issues has been moved to ${ownerDestination}/${repoDestination}`)
   } catch (error) {
     Core.setFailed(error.message);
   }
