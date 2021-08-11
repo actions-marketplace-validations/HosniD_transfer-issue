@@ -27,6 +27,11 @@ async function run() {
     const ownerDestination = Core.getInput('owner-destination')
     const issuesWithLabels = Core.getInput('labels').split(',')
     const issuesWithStatus = Core.getInput('status')
+
+    console.log('RepoSource', Github.context.repo.repo)
+    console.log('ownerSource', Github.context.repo.owner)
+    console.log('RepoSource', repoSource)
+    console.log('ownerSource', ownerSource)
     Core.endGroup()
 
     Core.startGroup("📑 Getting all Issues in repository...")
@@ -35,10 +40,10 @@ async function run() {
     do {
       Core.info(`Getting data from Issues page ${page}...`)
       console.log('RepoSource', repoSource)
-      console.log('ownerSource', repoSource)
+      console.log('ownerSource', ownerSource)
       issuesPage = await octokit.issues.listForRepo({
         owner: ownerSource,
-        repo: ownerDestination,
+        repo: repoSource,
         state: issuesWithStatus,
         labels: issuesWithLabels,
         page
