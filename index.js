@@ -22,6 +22,8 @@ async function run() {
     let issuesPage
     do {
       Core.info(`Getting data from Issues page ${page}...`)
+      console.log('log::repoSource', repoSource)
+      console.log(`repoSource:: ${repoSource}`)
       issuesPage = await octokit.issues.listForRepo({
         repo: repoSource,
         state: "all",
