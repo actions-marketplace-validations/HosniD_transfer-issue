@@ -1,13 +1,15 @@
-name: 'Wait'
-description: 'Wait a designated number of milliseconds'
+name: 'Transfer Issue'
+description: 'Transfers github issue from github repo to another github repo'
 inputs:
-  milliseconds:  # id of input
-    description: 'number of milliseconds to wait'
+  repo-source:
+    description: 'repo to copy from'
     required: true
-    default: '1000'
-outputs:
-  time: # output will be available to future steps
-    description: 'The message to output'
+  repo-destination:
+      description: 'repo to copy to'
+      required: true
+#outputs:
+#  time: # output will be available to future steps
+#    description: 'The message to output'
 runs:
   using: 'node12'
   main: 'dist/index.js'
