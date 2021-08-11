@@ -5,11 +5,22 @@ inputs:
     description: 'repo to copy from'
     required: true
   repo-destination:
-      description: 'repo to copy to'
-      required: true
-#outputs:
-#  time: # output will be available to future steps
-#    description: 'The message to output'
+    description: 'repo to copy to'
+    required: true
+  owner-source:
+    description: 'owner of the repo to take issue from'
+    required: false
+  owner-destination:
+    description: 'owner of the repo to save issue to'
+    required: true
+  labels:
+    description: 'issues with this labels will be created in destination repo: e.g. feature,bug,test...'
+    required: false
+    default: '' #empty
+  state:
+    description : 'status of issues to be created in destination repo'
+    required: false
+    default: all # open, closed or all
 runs:
   using: 'node12'
   main: 'dist/index.js'

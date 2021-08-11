@@ -6,41 +6,52 @@ const Github = require("@actions/github")
 // most @actions toolkit packages have async methods
 async function run() {
   try {
-    Core.startGroup("🚦 Checking Inputs and Initializing...")
-
-    const repoSource = Core.getInput('repo-source')
-    const repoDestination = Core.getInput('repo-destination')
+    Core.startGroup("🚦 Initializing...")
 
     Core.info("Auth with GitHub Token...")
     const octokit = new Octokit()
     Core.info("Done.")
     Core.endGroup()
 
+    Core.startGroup("Importing inputs...")
+    const repoSource = Core.getInput('repo-source') || Github.context.repo.repo
+    const ownerSource = Core.getInput('owner-source') || Github.context.repo.owner
+    const repoDestination = Core.getInput('repo-destination')
+    const ownerDestination = Core.getInput('owner-destination')
+    const issuesWithLabels = Core.getInput('labels').split(',')
+    const issuesWithStatus = Core.getInput('status')
+    Core.endGroup()
+
     Core.startGroup("📑 Getting all Issues in repository...")
     let page = 1
-    const issuesData = []
     let issuesPage
     do {
       Core.info(`Getting data from Issues page ${page}...`)
-      console.log('log::repoSource', repoSource)
-      Core.info(`repoSource:: ${repoSource}`)
+      console.log('RepoSource', repoSource)
+      console.log('ownerSource', repoSource)
       issuesPage = await octokit.issues.listForRepo({
-        owner: Github.context.repo.owner,
-        repo: Github.context.repo.repo,
-        state: "all",
+        owner: ownerSource,
+        repo: ownerDestination,
+        state: issuesWithStatus,
+        labels: issuesWithLabels,
         page
       });
-      console.log('issuesPage', issuesPage)
+      for (let issue of issuesPage.data) {
+        octokit.issues.create({
+          owner: ownerDestination,
+          repo: repoDestination,
+          title: issue.title,
+          body: `${issue.body}
+          link: ${issue.url}`,
+          labels: ['auto']
+        });
+      }
       Core.info(`There are ${issuesPage.data.length} Issues...`)
-      issuesData.push(issuesPage.data)
       if (issuesPage.data.length) {
         Core.info("Next page...")
       }
       page++
     } while (issuesPage.data.length)
-    console.log('issuesData', issuesData)
-
-    // Core.setOutput('time', new Date().toTimeString());
   } catch (error) {
     Core.setFailed(error.message);
   }
