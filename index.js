@@ -36,7 +36,7 @@ async function run() {
         page
       });
       for (let issue of issuesPage.data) {
-        octokit.issues.create({
+       const newIssue = await  octokit.issues.create({
           owner: ownerDestination,
           repo: repoDestination,
           title: issue.title,
@@ -44,6 +44,7 @@ async function run() {
           link: ${issue.url}`,
           labels: ['auto']
         });
+       Core.info(`New Issue ${newIssue} created in ${ownerDestination}/${repoDestination}`)
       }
       Core.info(`There are ${issuesPage.data.length} Issues...`)
       if (issuesPage.data.length) {
