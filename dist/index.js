@@ -50,10 +50,11 @@ async function run() {
         page
       });
       Core.info(`issuesPageData ${issuesPage.data}`)
+      console.log('issuesPageData', issuesPage.data)
 
       for (let issue of issuesPage.data) {
         Core.info(`issue ${issue}`)
-        console.log(`issue ${issue}`)
+        console.log('issue', issue)
         const newIssue = await octokit.issues.create({
           owner: ownerDestination,
           repo: repoDestination,
