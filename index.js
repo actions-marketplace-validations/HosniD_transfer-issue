@@ -35,8 +35,11 @@ async function run() {
         labels: issuesWithLabels,
         page
       });
+      Core.info(`issuesPageData ${issuesPage.data}`)
+
       for (let issue of issuesPage.data) {
-       const newIssue = await  octokit.issues.create({
+        Core.info(`issue ${issue}`)
+        const newIssue = await octokit.issues.create({
           owner: ownerDestination,
           repo: repoDestination,
           title: issue.title,
