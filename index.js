@@ -84,7 +84,7 @@ async function run() {
     } while (issuesPage.data.length)
 
     const newIssues = issuesDataSource.filter(
-      (iSource) => issuesDataDestination.some((iDestination) => iSource.title !== iDestination))
+      (iSource) => issuesDataDestination.some((iDestination) => iSource.title !== iDestination.title))
 
     console.log('new Issues', newIssues)
 
