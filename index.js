@@ -37,7 +37,7 @@ async function run() {
     Core.startGroup("📑 Getting all Issues in source repository...")
     let page = 1
     let issuesPage
-    const issuesDataSource = []
+    let issuesDataSource = []
     do {
       Core.info(`Getting data from Issues page ${page}...`)
 
@@ -50,7 +50,7 @@ async function run() {
       });
       Core.info(`issuesPageData ${issuesPage.data}`)
       console.log('issuesPageData', issuesPage.data)
-      issuesDataSource.push(issuesPage.data)
+      issuesDataSource = issuesDataSource.concat(issuesPage.data)
 
       Core.info(`There are ${issuesPage.data.length} Issues...`)
       if (issuesPage.data.length) {
@@ -62,7 +62,7 @@ async function run() {
     Core.startGroup("📑 Getting all Issues in destination repository...")
     page = 1
 
-    const issuesDataDestination = []
+    let issuesDataDestination = []
     do {
       Core.info(`Getting data from Issues page ${page}...`)
 
@@ -74,7 +74,7 @@ async function run() {
 
       Core.info(`issuesPageData ${issuesPage.data}`)
       console.log('issuesPageData', issuesPage.data)
-      issuesDataDestination.push(issuesPage.data)
+      issuesDataDestination = issuesDataDestination.concat(issuesPage.data)
 
       Core.info(`There are ${issuesPage.data.length} Issues...`)
       if (issuesPage.data.length) {
