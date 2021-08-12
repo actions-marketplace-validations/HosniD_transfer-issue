@@ -59,9 +59,9 @@ async function run() {
           owner: ownerDestination,
           repo: repoDestination,
           title: issue.title,
-          body: `${issue.body}
-          link: ${issue.url}`,
-          labels: ['auto']
+          // body: `${issue.body}
+          // link: ${issue.url}`,
+          // labels: ['auto']
         });
        Core.info(`New Issue ${newIssue} created in ${ownerDestination}/${repoDestination}`)
        console.log(`New Issue ${newIssue} created in ${ownerDestination}/${repoDestination}`)
