@@ -1,6 +1,9 @@
 name: 'Transfer Issue'
 description: 'Transfers github issue from github repo to another github repo'
 inputs:
+  auth-secret:
+    description: 'github personal access token, it is safer to add it should be added to your repo secrets'
+    required: true
   repo-source:
     description: 'repo to copy from'
     required: true

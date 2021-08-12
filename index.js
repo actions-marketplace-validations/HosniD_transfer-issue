@@ -7,9 +7,14 @@ const Github = require("@actions/github")
 async function run() {
   try {
     Core.startGroup("🚦 Initializing...")
+    const authSecret = Core.getInput('auth-secret')
 
     Core.info("Auth with GitHub Token...")
-    const octokit = new Octokit()
+    const octokit = new Octokit(
+      {
+        auth: authSecret,
+      }
+  )
     Core.info("Done.")
     Core.endGroup()
 
@@ -67,6 +72,7 @@ async function run() {
     } while (issuesPage.data.length)
     Core.info(`All issues has been moved to ${ownerDestination}/${repoDestination}`)
   } catch (error) {
+    console.log('error', error)
     Core.setFailed(error.message);
   }
 }

@@ -14,9 +14,14 @@ const Github = __nccwpck_require__(438)
 async function run() {
   try {
     Core.startGroup("🚦 Initializing...")
+    const authSecret = Core.getInput('auth-secret')
 
     Core.info("Auth with GitHub Token...")
-    const octokit = new Octokit()
+    const octokit = new Octokit(
+      {
+        auth: authSecret,
+      }
+  )
     Core.info("Done.")
     Core.endGroup()
 
