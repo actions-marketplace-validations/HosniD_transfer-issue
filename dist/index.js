@@ -30,7 +30,7 @@ async function run() {
     const ownerSource = Core.getInput('owner-source') || Github.context.repo.owner
     const repoDestination = Core.getInput('repo-destination')
     const ownerDestination = Core.getInput('owner-destination')
-    const issuesWithLabels = Core.getInput('labels')?.split(',') || []
+    const issuesWithLabels = Core.getInput('labels') ? Core.getInput('labels').split(',') : []
     const issuesWithState = Core.getInput('state')
 
     console.log('repoSource', repoSource)
