@@ -20,6 +20,13 @@ async function run() {
     const ownerDestination = Core.getInput('owner-destination')
     const issuesWithLabels = Core.getInput('labels').split(',')
     const issuesWithState = Core.getInput('state')
+
+    console.log('repoSource', repoSource)
+    console.log('repoDestination', repoDestination)
+    console.log('ownerSource', ownerSource)
+    console.log('ownerDestination', ownerDestination)
+    console.log('issuesWithLabels', issuesWithLabels)
+    console.log('issuesWithState', issuesWithState)
     Core.endGroup()
 
     Core.startGroup("📑 Getting all Issues in repository...")
