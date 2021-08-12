@@ -19,7 +19,7 @@ inputs:
   labels:
     description: 'issues with this labels will be created in destination repo: e.g. feature,bug,test...'
     required: false
-    default: '' #empty
+    default:  #empty
   state:
     description : 'status of issues to be created in destination repo'
     required: false

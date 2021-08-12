@@ -23,7 +23,7 @@ async function run() {
     const ownerSource = Core.getInput('owner-source') || Github.context.repo.owner
     const repoDestination = Core.getInput('repo-destination')
     const ownerDestination = Core.getInput('owner-destination')
-    const issuesWithLabels = Core.getInput('labels').split(',')
+    const issuesWithLabels = Core.getInput('labels')?.split(',') || []
     const issuesWithState = Core.getInput('state')
 
     console.log('repoSource', repoSource)
@@ -34,9 +34,10 @@ async function run() {
     console.log('issuesWithState', issuesWithState)
     Core.endGroup()
 
-    Core.startGroup("📑 Getting all Issues in repository...")
+    Core.startGroup("📑 Getting all Issues in source repository...")
     let page = 1
     let issuesPage
+    const issuesDataSource = []
     do {
       Core.info(`Getting data from Issues page ${page}...`)
 
@@ -44,32 +45,63 @@ async function run() {
         owner: ownerSource,
         repo: repoSource,
         state: issuesWithState,
-        // labels: issuesWithLabels,
+        labels: issuesWithLabels,
         page
       });
       Core.info(`issuesPageData ${issuesPage.data}`)
       console.log('issuesPageData', issuesPage.data)
+      issuesDataSource.push(issuesPage.data)
 
-      for (let issue of issuesPage.data) {
-        Core.info(`issue ${issue}`)
-        console.log('issue', issue)
-        const newIssue = await octokit.issues.create({
-          owner: ownerDestination,
-          repo: repoDestination,
-          title: issue.title,
-          // body: `${issue.body}
-          // link: ${issue.url}`,
-          // labels: ['auto']
-        });
-       Core.info(`New Issue ${newIssue} created in ${ownerDestination}/${repoDestination}`)
-       console.log(`New Issue ${newIssue} created in ${ownerDestination}/${repoDestination}`)
-      }
       Core.info(`There are ${issuesPage.data.length} Issues...`)
       if (issuesPage.data.length) {
         Core.info("Next page...")
       }
       page++
     } while (issuesPage.data.length)
+
+    Core.startGroup("📑 Getting all Issues in destination repository...")
+    page = 1
+
+    const issuesDataDestination = []
+    do {
+      Core.info(`Getting data from Issues page ${page}...`)
+
+      issuesPage = await octokit.issues.listForRepo({
+        owner: ownerDestination,
+        repo: repoDestination,
+        page
+      });
+
+      Core.info(`issuesPageData ${issuesPage.data}`)
+      console.log('issuesPageData', issuesPage.data)
+      issuesDataDestination.push(issuesPage.data)
+
+      Core.info(`There are ${issuesPage.data.length} Issues...`)
+      if (issuesPage.data.length) {
+        Core.info("Next page...")
+      }
+      page++
+    } while (issuesPage.data.length)
+
+    const newIssues = issuesDataSource.filter(
+      (iSource) => issuesDataDestination.some((iDestination) => iSource.title !== iDestination))
+
+    console.log('new Issues', newIssues)
+
+    for (let issue of newIssues) {
+      Core.info(`issue ${issue}`)
+      console.log('issue', issue)
+      const newIssue = await octokit.issues.create({
+        owner: ownerDestination,
+        repo: repoDestination,
+        title: issue.title,
+        body: `${issue.body}
+          link: ${issue.url}`,
+        labels: ['auto']
+      });
+      Core.info(`New Issue ${newIssue} created in ${ownerDestination}/${repoDestination}`)
+      console.log(`New Issue ${newIssue} created in ${ownerDestination}/${repoDestination}`)
+    }
     Core.info(`All issues has been moved to ${ownerDestination}/${repoDestination}`)
   } catch (error) {
     console.log('error', error)
