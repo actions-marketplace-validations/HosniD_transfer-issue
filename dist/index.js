@@ -46,13 +46,14 @@ async function run() {
         owner: ownerSource,
         repo: repoSource,
         state: issuesWithState,
-        labels: issuesWithLabels,
+        // labels: issuesWithLabels,
         page
       });
       Core.info(`issuesPageData ${issuesPage.data}`)
 
       for (let issue of issuesPage.data) {
         Core.info(`issue ${issue}`)
+        console.log(`issue ${issue}`)
         const newIssue = await octokit.issues.create({
           owner: ownerDestination,
           repo: repoDestination,
@@ -62,6 +63,7 @@ async function run() {
           labels: ['auto']
         });
        Core.info(`New Issue ${newIssue} created in ${ownerDestination}/${repoDestination}`)
+       console.log(`New Issue ${newIssue} created in ${ownerDestination}/${repoDestination}`)
       }
       Core.info(`There are ${issuesPage.data.length} Issues...`)
       if (issuesPage.data.length) {
