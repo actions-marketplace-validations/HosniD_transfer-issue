@@ -21,7 +21,7 @@ async function run() {
       {
         auth: authSecret,
       }
-  )
+    )
     Core.info("Done.")
     Core.endGroup()
 
@@ -41,79 +41,61 @@ async function run() {
     console.log('issuesWithState', issuesWithState)
     Core.endGroup()
 
-    Core.startGroup("📑 Getting all Issues in source repository...")
-    let page = 1
-    let issuesPage
-    let issuesDataSource = []
-    do {
-      Core.info(`Getting data from Issues page ${page}...`)
+    const issuesDataSource = await getIssues(octokit, ownerSource, repoSource, issuesWithState, issuesWithLabels)
+    const issuesDataDestination = await getIssues(octokit, ownerDestination, repoDestination, null, null)
 
-      issuesPage = await octokit.issues.listForRepo({
-        owner: ownerSource,
-        repo: repoSource,
-        state: issuesWithState,
-        labels: issuesWithLabels,
-        page
-      });
-      Core.info(`issuesPageData ${issuesPage.data}`)
-      console.log('issuesPageData', issuesPage.data)
-      issuesDataSource = issuesDataSource.concat(issuesPage.data)
+    const titlesSource = issuesDataSource.map(s => s.title)
+    const titlesDestination = issuesDataDestination.map(s => s.title)
 
-      Core.info(`There are ${issuesPage.data.length} Issues...`)
-      if (issuesPage.data.length) {
-        Core.info("Next page...")
-      }
-      page++
-    } while (issuesPage.data.length)
+    const newTitle = titlesSource.filter(s => !titlesDestination.includes(s))
 
-    Core.startGroup("📑 Getting all Issues in destination repository...")
-    page = 1
 
-    let issuesDataDestination = []
-    do {
-      Core.info(`Getting data from Issues page ${page}...`)
+    const newIssues = issuesDataSource.filter(s => newTitle.includes(s.title))
 
-      issuesPage = await octokit.issues.listForRepo({
-        owner: ownerDestination,
-        repo: repoDestination,
-        page
-      });
-
-      Core.info(`issuesPageData ${issuesPage.data}`)
-      console.log('issuesPageData', issuesPage.data)
-      issuesDataDestination = issuesDataDestination.concat(issuesPage.data)
-
-      Core.info(`There are ${issuesPage.data.length} Issues...`)
-      if (issuesPage.data.length) {
-        Core.info("Next page...")
-      }
-      page++
-    } while (issuesPage.data.length)
-
-    const newIssues = issuesDataSource.filter(
-      (iSource) => issuesDataDestination.findIndex((iDestination) => iSource.title !== iDestination.title) === -1)
-
-    console.log('new Issues', newIssues)
+    if (newIssues.length) {
+      console.log(`There are ${newIssues.length} new issues`)
+    } else {
+      console.log(`There are no new issues`)
+    }
 
     for (let issue of newIssues) {
-      Core.info(`issue ${issue}`)
-      console.log('issue', issue)
-      const newIssue = await octokit.issues.create({
+      await octokit.issues.create({
         owner: ownerDestination,
         repo: repoDestination,
         title: issue.title,
         body: `${issue.body}
           link: ${issue.url}`,
-        labels: ['auto']
+        labels: ['support-bot']
       });
-      Core.info(`New Issue ${newIssue} created in ${ownerDestination}/${repoDestination}`)
-      console.log(`New Issue ${newIssue} created in ${ownerDestination}/${repoDestination}`)
+      Core.info(`New Issue ${issue.title} created in ${ownerDestination}/${repoDestination}`)
     }
-    Core.info(`All issues has been moved to ${ownerDestination}/${repoDestination}`)
+    if (newIssues.length) {
+      Core.info(`All issues has been moved to ${ownerDestination}/${repoDestination}`)
+    }
   } catch (error) {
     console.log('error', error)
     Core.setFailed(error.message);
   }
+}
+async function getIssues(octokit, owner, repo, state, labels) {
+
+  Core.startGroup(`📑 Getting all Issues in repository ${owner}/${repo}...`)
+  let page = 1
+  let issuesPage
+  let issuesData = []
+  do {
+    issuesPage = await octokit.issues.listForRepo({
+      owner: owner,
+      repo: repo,
+      ...(state && {state: state}),
+      ...(labels && {labels: labels}),
+      page
+    });
+    issuesData = issuesData.concat(issuesPage.data)
+    page++
+  } while (issuesPage.data.length)
+  Core.info(`${issuesData.length} collected...`)
+  return issuesData
 }
 
 run();
