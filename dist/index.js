@@ -44,13 +44,25 @@ async function run() {
     const issuesDataSource = await getIssues(octokit, ownerSource, repoSource, issuesWithState, issuesWithLabels)
     const issuesDataDestination = await getIssues(octokit, ownerDestination, repoDestination, null, null)
 
-    const titlesSource = issuesDataSource.map(s => s.title)
-    const titlesDestination = issuesDataDestination.map(s => s.title)
+    const urlsSource = issuesDataSource.map(s => s.url.split('.com').pop())
+    const urlsDestination = issuesDataDestination.map(s => {
+      const urlRegex = /(https?:\/\/[^\s]+)/g;
+      const match = s.body?.match(urlRegex)
+      const target = match?.find(s => s.includes(`/${ownerSource}/${repoSource}/issues`))
+      if (target) {
+        return target.split('.com').pop()
+      }
+      return false
+    }).filter(s => s)
+    console.log('content', urlsSource)
+    console.log('body', urlsDestination)
 
-    const newTitle = titlesSource.filter(s => !titlesDestination.includes(s))
+    const newIssuesUrls = urlsSource.filter(s => !urlsDestination.includes(s))
+    console.log('newIssuesUrls', newIssuesUrls)
 
+    const newIssues = issuesDataSource.filter(s => newIssuesUrls.includes(s.url.split('.com').pop()))
+    console.log('nreIssues', newIssues)
 
-    const newIssues = issuesDataSource.filter(s => newTitle.includes(s.title))
 
     if (newIssues.length) {
       console.log(`There are ${newIssues.length} new issues`)
