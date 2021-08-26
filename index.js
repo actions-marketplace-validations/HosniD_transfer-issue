@@ -73,7 +73,7 @@ async function run() {
         repo: repoDestination,
         title: issue.title,
         body: `${issue.body}
-          link: ${issue.url}`,
+          link: ${issue.html_url}`,
         labels: ['support-bot']
       });
       Core.info(`New Issue ${issue.title} created in ${ownerDestination}/${repoDestination}`)
