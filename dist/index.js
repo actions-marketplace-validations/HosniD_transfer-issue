@@ -50,7 +50,7 @@ async function run() {
       if (s.body) {
         const match = s.body.match(urlRegex)
         if (match) {
-          const target = match?.find(s => s.includes(`/${ownerSource}/${repoSource}/issues`))
+          const target = match.find(s => s.includes(`/${ownerSource}/${repoSource}/issues`))
           if (target) {
             return target.split('.com').pop()
           }
