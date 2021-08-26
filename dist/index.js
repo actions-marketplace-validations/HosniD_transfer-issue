@@ -47,11 +47,15 @@ async function run() {
     const urlsSource = issuesDataSource.map(s => s.url.split('.com').pop())
     const urlsDestination = issuesDataDestination.map(s => {
       const urlRegex = /(https?:\/\/[^\s]+)/g;
-      const match = s.body?.match(urlRegex)
-      const target = match?.find(s => s.includes(`/${ownerSource}/${repoSource}/issues`))
-      if (target) {
-        return target.split('.com').pop()
+      if (s.body) {
+        const match = s.body.match(urlRegex)
+        const target = match?.find(s => s.includes(`/${ownerSource}/${repoSource}/issues`))
+        if (target) {
+          return target.split('.com').pop()
+        }
       }
+
+
       return false
     }).filter(s => s)
     console.log('content', urlsSource)
