@@ -44,7 +44,7 @@ async function run() {
     const issuesDataSource = await getIssues(octokit, ownerSource, repoSource, issuesWithState, issuesWithLabels)
     const issuesDataDestination = await getIssues(octokit, ownerDestination, repoDestination, null, null)
 
-    const urlsSource = issuesDataSource.map(s => s.url.split('.com').pop())
+    const urlsSource = issuesDataSource.map(s => s.html_url.split('.com').pop())
     const urlsDestination = issuesDataDestination.map(s => {
       const urlRegex = /(https?:\/\/[^\s]+)/g;
       if (s.body) {
@@ -64,7 +64,7 @@ async function run() {
     const newIssuesUrls = urlsSource.filter(s => !urlsDestination.includes(s))
     console.log('newIssuesUrls', newIssuesUrls)
 
-    const newIssues = issuesDataSource.filter(s => newIssuesUrls.includes(s.url.split('.com').pop()))
+    const newIssues = issuesDataSource.filter(s => newIssuesUrls.includes(s.html_url.split('.com').pop()))
     console.log('nreIssues', newIssues)
 
 
