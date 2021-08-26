@@ -42,13 +42,13 @@ async function run() {
       const urlRegex = /(https?:\/\/[^\s]+)/g;
       if (s.body) {
         const match = s.body.match(urlRegex)
-        const target = match?.find(s => s.includes(`/${ownerSource}/${repoSource}/issues`))
-        if (target) {
-          return target.split('.com').pop()
+        if (match) {
+          const target = match?.find(s => s.includes(`/${ownerSource}/${repoSource}/issues`))
+          if (target) {
+            return target.split('.com').pop()
+          }
         }
       }
-
-
       return false
     }).filter(s => s)
     console.log('content', urlsSource)
